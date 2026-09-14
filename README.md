@@ -56,3 +56,19 @@ content-type: application/json
 FastAPI automatically generates interactive API documentation. Once the server is running, you can access it at `http://localhost:8000/docs`.
 
 ![Swagger UI Screenshot](image.png)
+
+
+## DB Browser for SQLite
+
+Ran 
+```sql
+UPDATE tasks SET done = 1;
+```
+ in DB Browser for SQLite's "Execute SQL" tab, then called GET /tasks from the running API. Output:
+```
+Execution finished without errors.
+Result: query executed successfully. Took 1ms, 6 rows affected
+At line 1:
+UPDATE tasks SET done = 1
+```
+After writing changes, GET /tasks reflected all tasks as done: true, with no server restart required.

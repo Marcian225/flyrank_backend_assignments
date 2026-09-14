@@ -14,11 +14,11 @@ class TaskUpdate(BaseModel):
 app = FastAPI()
 
 
-tasks = [
-    {"id": 1, "title": "task1", "done": True},
-    {"id": 2, "title": "task2", "done": False},
-    {"id": 3, "title": "task3", "done": False},
-    ]
+# tasks = [
+#     {"id": 1, "title": "task1", "done": True},
+#     {"id": 2, "title": "task2", "done": False},
+#     {"id": 3, "title": "task3", "done": False},
+#     ]
 
 @app.get("/")
 async def root():
