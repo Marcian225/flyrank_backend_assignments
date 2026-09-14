@@ -52,12 +52,6 @@ async def get_task(item_id: int):
 @app.post("/tasks", status_code=201, summary="Create a new task")
 async def add_task(item:TaskCreate):
 
-
-
-
-
-
-
     if item.title and item.title.strip():
         with Session(engine) as session:
             new_task = Task(title = item.title, done = False)
@@ -82,30 +76,51 @@ async def update_task(item_id: int, item:TaskUpdate):
                 status_code = 400,
                 content = {"error": "Empty/Invalid body"}
             )
+
+    with Session(engine) as session:
+        # targetalt = session.get(Task,item_id)
+        target = session.exec(select(Task).where(Task.id == item_id)).first()
+
+        if not target:
+            return JSONResponse(
+                status_code = 404,
+                content = {"error": "Unknown id"}
+            )
+
+        if item.title and item.title.strip():
+            target.title = item.title
+        if item.done != None:
+            target.done = item.done
+        session.add(target)
+        session.commit()
+        session.refresh(target)
+        return target
     
-    for task in tasks:
-        if task["id"] == item_id:
-            if item.title and item.title.strip():
-                task["title"] = item.title
+    # for task in tasks:
+    #     if task["id"] == item_id:
+    #         if item.title and item.title.strip():
+    #             task["title"] = item.title
+    #         if item.done != None:
+    #             task["done"] = item.done
+    #         return task
 
-            if item.done != None:
-                task["done"] = item.done
-
-            return task
-
-    return JSONResponse(
-        status_code = 404,
-        content = {"error": "Unknown id"}
-    )
 
 @app.delete("/tasks/{item_id}", status_code = 204, summary="Delete a task")
 async def delete_task(item_id: int):
-    for task in tasks:
-        if task["id"] == item_id:
-            tasks.remove(task)
-            return
+    # for task in tasks:
+    #     if task["id"] == item_id:
+    #         tasks.remove(task)
+    #         return
 
-    return JSONResponse(
-        status_code = 404,
-        content = {"error": "Unknown id"}
-    )
+    with Session(engine) as session:
+        target = session.get(Task,item_id)
+
+        if target:
+            session.delete(target)
+            session.commit()
+            return
+        else:
+            return JSONResponse(
+                status_code = 404,
+                content = {"error": "Unknown id"}
+            )
