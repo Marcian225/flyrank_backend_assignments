@@ -3,25 +3,32 @@ Fly rankAI Internship Assignment, backend engineering ex1
 
 # Task Management API
 
-A simple, in-memory CRUD API for managing tasks, built with Python and FastAPI. This project demonstrates basic API routing, data validation with Pydantic, HTTP status code handling, and auto-generated Swagger UI documentation.
+A simple CRUD API for managing tasks, built with Python and FastAPI. This project demonstrates basic API routing, data validation with Pydantic, HTTP status code handling, and auto-generated Swagger UI documentation.
 
 ## How to Install & Run
 
-1. Make sure you have Python installed.
-2. Save the API code in a file named `main.py`.
-3. Run the following command in your terminal to install the requirements and start the development server:
+This project uses `uv` for dependency management. Requirements are listed in `pyproject.toml`.
+
+1. Clone the repo.
+2. Run:
 
 ```bash
-pip install fastapi uvicorn pydantic && uvicorn main:app --reload
-```
-for uv
-```bash
-uv run --with fastapi --with uvicorn --with pydantic uvicorn main:app --reload
+uv sync
+uv run fastapi dev main.py
 ```
 
-The API will be available at `http://localhost:8000`.
+The API will be available at `http://localhost:8000`. On first run, `tasks.db` is created automatically with the `tasks` table and three seeded example tasks. No manual setup is required.
+
+## Database
+
+This project uses SQLite as the database, accessed through SQLModel.
+
+SQLite was chosen because it needs no separate database server, stores everything in a single file, and that file survives application restarts.
+
+The database file is `tasks.db`, created automatically the first time the app starts (via `SQLModel.metadata.create_all`). It is listed in `.gitignore`, so it is not committed to the repo — each clone starts with a fresh, empty file, and the app seeds it with three example tasks on first run.
 
 ## API Endpoints
+All endpoints read from and write to `tasks.db`. Data persists across restarts.
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
@@ -59,16 +66,17 @@ FastAPI automatically generates interactive API documentation. Once the server i
 
 
 ## DB Browser for SQLite
-
-Ran 
+![alt text](image-1.png)
+Run
 ```sql
 UPDATE tasks SET done = 1;
 ```
- in DB Browser for SQLite's "Execute SQL" tab, then called GET /tasks from the running API. Output:
-```
-Execution finished without errors.
-Result: query executed successfully. Took 1ms, 6 rows affected
-At line 1:
-UPDATE tasks SET done = 1
-```
+ in DB Browser for SQLite's "Execute SQL" tab, then called GET /tasks from the running API.
+![alt text](image-4.png)
+
+Result:
+
+![alt text](image-3.png)
+
+
 After writing changes, GET /tasks reflected all tasks as done: true, with no server restart required.

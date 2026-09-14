@@ -3,6 +3,8 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlmodel import Session, select
 from database import engine, Task
+from contextlib import asynccontextmanager
+from database import create_db_and_tables, seed_tasks
 
 class TaskCreate(BaseModel):
     title: str | None = None
@@ -11,7 +13,13 @@ class TaskUpdate(BaseModel):
     title: str | None = None
     done: bool | None = None
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    seed_tasks()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 
 # tasks = [
