@@ -51,11 +51,24 @@ async def get_task(item_id: int):
 
 @app.post("/tasks", status_code=201, summary="Create a new task")
 async def add_task(item:TaskCreate):
+
+
+
+
+
+
+
     if item.title and item.title.strip():
-        newid = max((task["id"] for task in tasks), default=0) +1
-        newtask = {"id": newid, "title": item.title, "done": False}
-        tasks.append(newtask)
-        return newtask
+        with Session(engine) as session:
+            new_task = Task(title = item.title, done = False)
+            session.add(new_task)
+            session.commit()
+            session.refresh(new_task)
+            return new_task
+        # newid = max((task["id"] for task in tasks), default=0) +1
+        # newtask = {"id": newid, "title": item.title, "done": False}
+        # tasks.append(newtask)
+        # return newtask
     else:
         return JSONResponse(
             status_code = 400,
