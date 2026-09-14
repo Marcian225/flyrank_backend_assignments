@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from sqlmodel import Session, select
+from database import engine, Task
+
 class TaskCreate(BaseModel):
     title: str | None = None
 
@@ -27,13 +30,19 @@ async def health_check():
 
 @app.get("/tasks", summary="Retrieve all tasks")
 async def get_all_tasks():
-    return tasks
+    with Session(engine) as session:
+        return session.exec(select(Task)).all()
+
 
 @app.get("/tasks/{item_id}", summary="Retrieve a specific task by ID")
 async def get_task(item_id: int):
-    for task in tasks:
-        if task["id"] == item_id:
-            return task
+    # for task in tasks:
+    #     if task["id"] == item_id:
+    #         return task
+
+    with Session(engine) as session:
+        task = session.get(Task, item_id)
+        if task: return task
 
     return JSONResponse(
         status_code = 404,
