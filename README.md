@@ -80,3 +80,28 @@ Result:
 
 
 After writing changes, GET /tasks reflected all tasks as done: true, with no server restart required.
+
+
+
+## Database (PostgreSQL in Docker)
+
+The API uses a PostgreSQL server running in a Docker container.
+No local Postgres installation is required.
+
+Start it with:
+    docker run --name taskdb \
+      -e POSTGRES_PASSWORD=dev \
+      -e POSTGRES_DB=tasks \
+      -p 5432:5432 \
+      -v taskdata:/var/lib/postgresql/data \
+      -d postgres:17
+
+Note: the version is pinned to 17 on purpose. Postgres 18 changed the
+expected data mount path to /var/lib/postgresql.
+
+Useful commands:
+    docker ps                    # is it running?
+    docker logs taskdb           # server output
+    docker stop taskdb           # stop (data is kept)
+    docker start taskdb          # start it again
+    docker exec -it taskdb psql -U postgres -d tasks   # SQL prompt
