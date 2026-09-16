@@ -54,7 +54,7 @@ async def get_task(item_id: int):
 
     return JSONResponse(
         status_code = 404,
-        content = {"error": "Task not found"}
+        content = {"error": f"Task {item_id} not found"}
     )
 
 @app.post("/tasks", status_code=201, summary="Create a new task")
@@ -92,7 +92,7 @@ async def update_task(item_id: int, item:TaskUpdate):
         if not target:
             return JSONResponse(
                 status_code = 404,
-                content = {"error": "Unknown id"}
+                content = {"error": f"Task {item_id} not found"}
             )
 
         if item.title and item.title.strip():
@@ -130,5 +130,5 @@ async def delete_task(item_id: int):
         else:
             return JSONResponse(
                 status_code = 404,
-                content = {"error": "Unknown id"}
+                content = {"error": f"Task {item_id} not found"}
             )
