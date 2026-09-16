@@ -54,7 +54,7 @@ async def get_task(item_id: int):
 
     return JSONResponse(
         status_code = 404,
-        content = {"error": f"Task {item_id} not found"}
+        content = {"error": "Task not found"}
     )
 
 @app.post("/tasks", status_code=201, summary="Create a new task")
