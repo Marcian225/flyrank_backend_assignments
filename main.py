@@ -6,7 +6,12 @@ from database import engine, Task
 from contextlib import asynccontextmanager
 from database import create_db_and_tables, seed_tasks
 from supabase_client import supabase
+from supabase_auth.errors import AuthApiError
 
+
+class AuthCredentials(BaseModel):
+    email: str | None = None
+    password: str | None = None
 class TaskCreate(BaseModel):
     title: str | None = None
 
@@ -28,6 +33,44 @@ app = FastAPI(lifespan=lifespan)
 
 
 ########### ENDPOINTS
+
+@app.post("/auth/signup",status_code=201 ,summary="Signs up the new user")
+async def signup(auth_data: AuthCredentials):
+    if (auth_data.email and auth_data.email.strip()) and (auth_data.password and auth_data.password.strip()):
+        response = supabase.auth.sign_up({
+            "email": auth_data.email,
+            "password": auth_data.password,
+        })
+        return response.user
+    else:
+        return JSONResponse(
+            status_code = 400,
+            content = {"error": "Email and password required"}
+        )
+
+@app.post("/auth/login",status_code=200 ,summary="Logs in the user")
+async def login(auth_data: AuthCredentials):
+    if (auth_data.email and auth_data.email.strip()) and (auth_data.password and auth_data.password.strip()):
+        try:
+            response = supabase.auth.sign_in_with_password({
+                "email": auth_data.email,
+                "password": auth_data.password
+            })
+        except AuthApiError:
+            return JSONResponse(
+                status_code= 401,
+                content= {"error": "Invalid login credentials"}
+            )
+        return {
+            "access_token": response.session.access_token,
+            "refresh_token": response.session.refresh_token,
+        }
+    else:
+        return JSONResponse(
+            status_code = 400,
+            content = {"error": "Email and password required"}
+        )
+
 
 
 @app.get("/")
