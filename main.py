@@ -5,6 +5,7 @@ from sqlmodel import Session, select
 from database import engine, Task
 from contextlib import asynccontextmanager
 from database import create_db_and_tables, seed_tasks
+from supabase_client import supabase
 
 class TaskCreate(BaseModel):
     title: str | None = None
@@ -17,16 +18,17 @@ class TaskUpdate(BaseModel):
 async def lifespan(app: FastAPI):
     create_db_and_tables()
     seed_tasks()
+    print("Server running and connected to Supabase")
     yield
+
 
 app = FastAPI(lifespan=lifespan)
 
 
-# tasks = [
-#     {"id": 1, "title": "task1", "done": True},
-#     {"id": 2, "title": "task2", "done": False},
-#     {"id": 3, "title": "task3", "done": False},
-#     ]
+
+
+########### ENDPOINTS
+
 
 @app.get("/")
 async def root():
