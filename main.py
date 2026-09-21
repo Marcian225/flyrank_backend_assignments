@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Header, Depends, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from sqlmodel import Session, select
 from database import engine, Task
@@ -29,16 +30,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+bearer_scheme = HTTPBearer(auto_error=False)
 
-
-async def get_token(authorization: str | None = Header(default=None)) -> str:
-    if authorization is None:
+async def get_token(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),) -> str:
+    if credentials is None or not credentials.credentials.strip():
         raise HTTPException(status_code=401, detail="Access token required")
-    scheme, _, token = authorization.partition(" ")
-    token = token.strip()
-    if scheme.lower() != "bearer" or not token:
-        raise HTTPException(status_code=401, detail="Access token required")
-    return token
+    return credentials.credentials.strip()
 
 async def get_current_user(token: str = Depends(get_token)):
     try:

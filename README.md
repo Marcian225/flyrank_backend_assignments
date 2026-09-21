@@ -67,7 +67,7 @@ content-type: application/json
 
 FastAPI generates the docs automatically, served at `http://localhost:8000/docs` while the stack is running.
 
-![Swagger UI Screenshot](image.png)
+![Swagger UI Screenshot](/images/image.png)
 
 ## The data in PostgreSQL
 
@@ -83,7 +83,7 @@ Or list the table and rows directly:
 docker compose exec db psql -U postgres -d tasks -c "\dt" -c "SELECT * FROM tasks;"
 ```
 
-![Tasks table in PostgreSQL](image-5.png)
+![Tasks table in PostgreSQL](/images/image-5.png)
 
 `done` is stored as a real PostgreSQL `BOOLEAN` (`t`/`f`). The same SQLModel class produced an integer column under SQLite — the ORM picks column types from the database dialect.
 
@@ -126,6 +126,10 @@ uv run fastapi dev main.py
 
 **Code changes not taking effect** — compose reuses the image it built earlier. Use `docker compose up --build` after editing application code.
 
+
+## A4 Stage 5 Requirement (Swagger UI Documentation with bearer auth)
+![alt text](/images/image-6.png)
+![alt text](/images/image-7.png)
 ## Previous assignments
 
 Requirements below were met in earlier assignments against the storage backend used at the time. The current stack is PostgreSQL, described above.
@@ -134,7 +138,7 @@ Requirements below were met in earlier assignments against the storage backend u
 
 A2 stored tasks in a SQLite file (`tasks.db`) through SQLModel, chosen at that stage because it needs no separate server and keeps everything in one file that survives restarts.
 
-![DB Browser for SQLite](image-1.png)
+![DB Browser for SQLite](/images/image-1.png)
 
 Running this in DB Browser's "Execute SQL" tab:
 
@@ -142,10 +146,10 @@ Running this in DB Browser's "Execute SQL" tab:
 UPDATE tasks SET done = 1;
 ```
 
-![Executing SQL](image-4.png)
+![Executing SQL](/images/image-4.png)
 
 Result after calling `GET /tasks` on the running API:
 
-![All tasks marked done](image-3.png)
+![All tasks marked done](/images/image-3.png)
 
 All tasks came back with `done: true` without a server restart, confirming the API read live from the database file rather than from memory.
