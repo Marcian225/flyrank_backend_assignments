@@ -54,10 +54,19 @@ async def get_profile(authorization: str | None = Header(default = None)):
             content = {"error": "Access token required"}
         )
     else:
-        return {"message": "Token received"}
+        try:
+            response = supabase.auth.get_user(token.strip())
+            return {
+                "id": response.user.id,
+                "email": response.user.email,
+                "created_at": response.user.created_at,
+            }
+        except AuthApiError:
+            return JSONResponse(
+                status_code= 401,
+                content= {"error": "Invalid or expired token."}
+            )
     
-
-
 
 @app.post("/auth/signup",status_code=201 ,summary="Signs up the new user")
 async def signup(auth_data: AuthCredentials):
