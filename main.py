@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlmodel import Session, select
@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from database import create_db_and_tables, seed_tasks
 from supabase_client import supabase
 from supabase_auth.errors import AuthApiError
+
 
 
 class AuthCredentials(BaseModel):
@@ -33,6 +34,30 @@ app = FastAPI(lifespan=lifespan)
 
 
 ########### ENDPOINTS
+
+@app.get("/public/info", status_code=200, summary = "Gets public info")
+async def get_info():
+    return { "message": "Welcome stranger! This info is public." } 
+
+@app.get("/protected/profile", status_code=200, summary = "Gets profile info")
+async def get_profile(authorization: str | None = Header(default = None)):
+    if authorization == None: 
+        return JSONResponse(
+            status_code = 401,
+            content = {"error": "Access token required"}
+        )
+    scheme, _, token = authorization.partition(" ")
+
+    if not token.strip() or scheme.lower() != "bearer":
+        return JSONResponse(
+            status_code = 401,
+            content = {"error": "Access token required"}
+        )
+    else:
+        return {"message": "Token received"}
+    
+
+
 
 @app.post("/auth/signup",status_code=201 ,summary="Signs up the new user")
 async def signup(auth_data: AuthCredentials):
